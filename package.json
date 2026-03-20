@@ -1,6 +1,6 @@
 {
     "name": "ring-timer-react",
-    "version": "2.0.0-SNAPSHOT",
+    "version": "2.0.0",
     "private": true,
     "dependencies": {
         "@testing-library/jest-dom": "^6.4.8",

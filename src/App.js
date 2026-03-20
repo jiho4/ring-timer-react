@@ -1,132 +1,91 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import './App.css';
+import { useTimer } from './hooks/useTimer';
+import { useKeyboardControls } from './hooks/useKeyboardControls';
+import { validateInput } from './utils/validation';
+import { getBackgroundColor } from './utils/colors';
+import { InitialScreen } from './components/InitialScreen';
+import { TimerScreen } from './components/TimerScreen';
+import { CONFIG } from './config';
 
 function App() {
-    // State variables
-    const [interval, setInterval] = useState(0); // Interval in seconds
-    const [inputValue, setInputValue] = useState(''); // Input value for interval
-    const [loopCount, setLoopCount] = useState(0); // Current loop count
-    const [remainingSeconds, setRemainingSeconds] = useState(0); // Remaining seconds in the current loop
-    const [isRunning, setIsRunning] = useState(false); // Timer running status
-    const [startedTime, setStartedTime] = useState(null); // Time when the timer started
-    const intervalRef = useRef(null); // Reference to the interval timer
+    const [inputValue, setInputValue] = useState(CONFIG.DEFAULT_INTERVAL_SECONDS.toString());
+    const [errorMessage, setErrorMessage] = useState('');
 
-    // Play the bell sound
-    const ringBell = () => {
-        const audio = new Audio(`${process.env.PUBLIC_URL}/resources/Ping.mp3`);
-        audio.play().catch(error => {
-            console.error('Error playing audio:', error);
-        });
+    const {
+        intervalSeconds,
+        loopCount,
+        remainingSeconds,
+        isRunning,
+        isPaused,
+        startTimer,
+        stopTimer,
+        togglePause,
+        resetInterval,
+        calculateElapsedTime
+    } = useTimer();
+
+    const handleValidate = () => {
+        const validation = validateInput(inputValue);
+        setErrorMessage(validation.message);
+        return validation.isValid;
     };
 
-    // Start the timer and initialize the state variables
-    const startTimer = () => {
+    const handleStart = () => {
+        if (!handleValidate()) {
+            return;
+        }
         const seconds = parseInt(inputValue, 10);
-        if (!isNaN(seconds) && seconds > 0) {
-            setInterval(seconds);
-            setRemainingSeconds(seconds);
-            setLoopCount(0);
-            setIsRunning(true);
-            setStartedTime(Date.now());
-        }
+        startTimer(seconds);
+        setErrorMessage('');
     };
 
-    // Format time in HH:MM:SS format
-    function formatTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const remainingSeconds = seconds % 60;
+    const handleStop = () => {
+        stopTimer();
+        setInputValue(intervalSeconds.toString());
+        setErrorMessage('');
+    };
 
-        return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
-    }
+    const handleInputChange = (value) => {
+        setInputValue(value);
+        setErrorMessage('');
+    };
 
-    // Pad a number with leading zeros
-    function padZero(number) {
-        return number.toString().padStart(2, '0');
-    }
+    useKeyboardControls({
+        isRunning,
+        isPaused,
+        intervalSeconds,
+        onStart: handleStart,
+        onStop: handleStop,
+        onTogglePause: togglePause,
+        onReset: resetInterval
+    });
 
-    // Calculate elapsed time since the timer started
-    function calculateElapsedTime() {
-        if (startedTime) {
-            const currentTime = Date.now();
-            const elapsedMilliseconds = currentTime - startedTime;
-            const elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
-            return elapsedSeconds;
-        }
-        return 0;
-    }
+    const backgroundColor = getBackgroundColor(isRunning, remainingSeconds);
 
-    // Event listener to handle key presses
-    useEffect(() => {
-        const handleKeyPress = (event) => {
-            if (event.key === ' ') {
-                if (isRunning) {
-                    setLoopCount((prevCount) => prevCount + 1);
-                    setRemainingSeconds(interval);
-                }
-            } else if (event.key === 'Escape') {
-                setIsRunning(false);
-                setInputValue('');
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyPress);
-        return () => {
-            window.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [isRunning, interval, loopCount]);
-
-    // Timer to update the remaining seconds
-    useEffect(() => {
-        if (isRunning && remainingSeconds > 0) {
-            intervalRef.current = setTimeout(() => {
-                setRemainingSeconds((prevSeconds) => prevSeconds - 1);
-            }, 1000);
-        } else if (isRunning && remainingSeconds === 0) {
-            ringBell();
-        }
-        return () => clearTimeout(intervalRef.current);
-    }, [isRunning, remainingSeconds]);
-
-    // Render the component
     return (
         <div className="App">
-            <header className="App-header">
+            <header className="App-header" style={{ backgroundColor }}>
                 <h3>Ring Timer</h3>
                 {!isRunning ? (
-                    // Render input and start button when the timer is not running
-                    <div>
-                        <input
-                            type="number"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            placeholder="Enter interval in seconds"
-                        />
-                        <button onClick={startTimer}>Start</button>
-                    </div>
+                    <InitialScreen
+                        inputValue={inputValue}
+                        onInputChange={handleInputChange}
+                        onStart={handleStart}
+                        errorMessage={errorMessage}
+                        onValidate={handleValidate}
+                    />
                 ) : (
-                    // Render timer information when the timer is running
-                    <div style={{ fontFamily: 'monospace', fontSize: 'smaller' }}>
-                        <div style={{ color: 'gray', fontSize: 'small' }}>
-                            <p>Interval Setting: {interval} sec</p>
-                            <p>Current Loop Count: {loopCount}</p>
-                            <p>Elapsed Time: {formatTime(calculateElapsedTime())}</p>
-                        </div>
-                        {remainingSeconds > 0 ? (
-                            // Render remaining time when there are remaining seconds
-                            <div>
-                                <p>Time Left</p>
-                                <p>{formatTime(remainingSeconds)}</p>
-                            </div>
-                        ) : (
-                            // Render bell and empty line when the timer is completed
-                            <div>
-                                <p><span role="img" aria-label="bell">🔔</span>RING!</p>
-                                <p>&nbsp;</p>
-                            </div>
-                        )}
-                        <p style={{ color: 'gray', fontSize: 'small' }}>Press 'Space' to continue or 'Esc' to reset</p>
-                    </div>
+                    <TimerScreen
+                        intervalSeconds={intervalSeconds}
+                        loopCount={loopCount}
+                        remainingSeconds={remainingSeconds}
+                        isPaused={isPaused}
+                        calculateElapsedTime={calculateElapsedTime}
+                        onReset={resetInterval}
+                        onTogglePause={togglePause}
+                        onStop={handleStop}
+                    />
                 )}
             </header>
         </div>

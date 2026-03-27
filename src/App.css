@@ -23,3 +23,7 @@ button {
     font-size: 28px;
     cursor: pointer;
 }
+
+.timer-remaining-time {
+    font-size: 3rem;
+}

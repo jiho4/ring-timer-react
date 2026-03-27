@@ -11,12 +11,13 @@ A React-based interval timer application with audio notifications. Perfect for P
 - **Customizable Intervals** - Set any timer duration
 - **Audio Notifications** - Bell sound plays when time expires
 - **Pause/Resume** - Pause and resume timer at any point
-- **Loop Counter** - Tracks how many intervals completed
+- **Loop Counter** - Tracks how many intervals completed (grace period prevents accidental increments)
 - **Elapsed Time** - Shows total time elapsed since start
 - **Visual Warning** - Background gradually changes to yellow, then red as time runs out
-- **Keyboard Shortcuts** - Full keyboard control support
+- **Keyboard Shortcuts** - Full keyboard control support (modifier keys ignored)
 - **Input Validation** - Prevents invalid time values
 - **Last Value Memory** - Remembers your last interval setting
+- **Material UI Controls** - Icon buttons with color-coded actions
 
 ## Usage
 
@@ -31,7 +32,7 @@ A React-based interval timer application with audio notifications. Perfect for P
 | Key | Action | Available When |
 |-----|--------|----------------|
 | **Enter** | Start timer | Initial screen |
-| **Any key** | Reset interval (restart countdown) | Timer running & not paused |
+| **Any key** | Reset interval (restart countdown) | Timer running & not paused (modifier keys ignored) |
 | **P** | Pause/Resume timer | Timer running |
 | **Esc** | Stop timer and return to setup | Timer running |
 
@@ -78,6 +79,7 @@ src/
 ## Technology Stack
 
 - **React 18** - UI framework
+- **Material UI** - Icon buttons and tooltips
 - **Jest** - Testing framework
 - **React Testing Library** - Component testing utilities
 - **Create React App** - Build tooling
@@ -174,9 +176,14 @@ Application settings are configured using environment variables in the `.env` fi
   - Default value shown in the input field on app load (in seconds)
   - Example: Set to `1500` for a 25-minute Pomodoro timer
 
+- **`REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS`**
+  - Resets triggered within this window after start will not increment the loop count
+  - Exception: always increments if the configured interval is shorter than this value
+  - Example: Set to `5` to ignore resets within the first 5 seconds
+
 #### Color Settings
 
-- **`REACT_APP_COLOR_DEFAULT`**
+- **`REACT_APP_COLOR_BACKGROUND`**
   - Default background color (hex format)
   - Example: `#282c34` (dark gray)
 

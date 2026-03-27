@@ -172,20 +172,26 @@ describe('App Integration Tests', () => {
     });
 
     test('reset button increments loop count', () => {
+        jest.useFakeTimers();
         render(<App />);
 
         const startButton = screen.getByRole('button', { name: 'Start' });
         fireEvent.click(startButton);
 
         expect(screen.getByText('Current Loop Count: 0')).toBeInTheDocument();
+
+        jest.advanceTimersByTime(Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS) * 1000);
 
         const resetButton = screen.getByRole('button', { name: 'Reset' });
         fireEvent.click(resetButton);
 
         expect(screen.getByText('Current Loop Count: 1')).toBeInTheDocument();
+
+        jest.useRealTimers();
     });
 
     test('any key resets interval when running', () => {
+        jest.useFakeTimers();
         render(<App />);
 
         const startButton = screen.getByRole('button', { name: 'Start' });
@@ -193,13 +199,17 @@ describe('App Integration Tests', () => {
 
         expect(screen.getByText('Current Loop Count: 0')).toBeInTheDocument();
 
-        fireEvent.keyDown(window, { key: 'a' });
+        const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS) * 1000;
 
+        jest.advanceTimersByTime(gracePeriod);
+        fireEvent.keyDown(window, { key: 'a' });
         expect(screen.getByText('Current Loop Count: 1')).toBeInTheDocument();
 
+        jest.advanceTimersByTime(gracePeriod);
         fireEvent.keyDown(window, { key: ' ' });
-
         expect(screen.getByText('Current Loop Count: 2')).toBeInTheDocument();
+
+        jest.useRealTimers();
     });
 
     test('reset button is disabled when paused', () => {

@@ -32,6 +32,9 @@ export function useKeyboardControls({
             }
 
             // Any other key while running and not paused - reset timer interval
+            const ignoredKeys = new Set(['Tab', 'CapsLock', 'Control', 'Alt', 'Meta', 'Shift']);
+            if (ignoredKeys.has(event.key)) return;
+
             if (isRunning && !isPaused) {
                 event.preventDefault();
                 onReset();

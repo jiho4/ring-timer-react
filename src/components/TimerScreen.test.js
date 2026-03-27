@@ -135,6 +135,9 @@ describe('TimerScreen', () => {
     test('displays keyboard shortcuts guide', () => {
         render(<TimerScreen {...defaultProps} />);
 
-        expect(screen.getByText(/Press any key to reset interval/)).toBeInTheDocument();
+        expect(screen.getByText('Keyboard Shortcuts')).toBeInTheDocument();
+        expect(screen.getByText(/Any key/)).toBeInTheDocument();
+        expect(screen.getByText(/'P'/)).toBeInTheDocument();
+        expect(screen.getByText(/'Esc'/)).toBeInTheDocument();
     });
 });

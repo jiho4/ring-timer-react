@@ -78,15 +78,16 @@ describe('useTimer', () => {
     });
 
     test('resets interval and increments loop count', () => {
+        const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS);
         const { result } = renderHook(() => useTimer());
 
         act(() => {
             result.current.startTimer(60);
         });
 
-        // Advance time
+        // Advance time past the grace period
         act(() => {
-            jest.advanceTimersByTime(5000);
+            jest.advanceTimersByTime(gracePeriod * 1000);
         });
 
         act(() => {
@@ -95,6 +96,64 @@ describe('useTimer', () => {
 
         expect(result.current.loopCount).toBe(1);
         expect(result.current.remainingSeconds).toBe(60);
+    });
+
+    test('does not increment loop count when reset within grace period of start', () => {
+        const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS);
+        const { result } = renderHook(() => useTimer());
+
+        act(() => {
+            result.current.startTimer(60);
+        });
+
+        act(() => {
+            jest.advanceTimersByTime((gracePeriod - 2) * 1000);
+        });
+
+        act(() => {
+            result.current.resetInterval();
+        });
+
+        expect(result.current.loopCount).toBe(0);
+        expect(result.current.remainingSeconds).toBe(60);
+    });
+
+    test('increments loop count when reset after grace period of start', () => {
+        const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS);
+        const { result } = renderHook(() => useTimer());
+
+        act(() => {
+            result.current.startTimer(60);
+        });
+
+        act(() => {
+            jest.advanceTimersByTime(gracePeriod * 1000);
+        });
+
+        act(() => {
+            result.current.resetInterval();
+        });
+
+        expect(result.current.loopCount).toBe(1);
+    });
+
+    test('always increments loop count when interval < grace period, even if reset immediately', () => {
+        const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS);
+        const { result } = renderHook(() => useTimer());
+
+        act(() => {
+            result.current.startTimer(gracePeriod - 2);
+        });
+
+        act(() => {
+            jest.advanceTimersByTime(500);
+        });
+
+        act(() => {
+            result.current.resetInterval();
+        });
+
+        expect(result.current.loopCount).toBe(1);
     });
 
     test('does not reset interval when paused', () => {

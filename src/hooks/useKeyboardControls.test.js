@@ -16,8 +16,8 @@ describe('useKeyboardControls', () => {
         };
     });
 
-    const fireKeyboardEvent = (key) => {
-        const event = new KeyboardEvent('keydown', { key });
+    const fireKeyboardEvent = (key, options = {}) => {
+        const event = new KeyboardEvent('keydown', { key, ...options });
         window.dispatchEvent(event);
     };
 
@@ -102,6 +102,16 @@ describe('useKeyboardControls', () => {
         renderHook(() => useKeyboardControls(mockHandlers));
 
         fireKeyboardEvent('a');
+
+        expect(mockHandlers.onReset).not.toHaveBeenCalled();
+    });
+
+    test.each(['Control', 'Alt', 'Meta', 'Shift', 'Tab', 'CapsLock'])(
+    'does not call onReset when %s key is pressed', (key) => {
+        mockHandlers.isRunning = true;
+        renderHook(() => useKeyboardControls(mockHandlers));
+
+        fireKeyboardEvent(key);
 
         expect(mockHandlers.onReset).not.toHaveBeenCalled();
     });

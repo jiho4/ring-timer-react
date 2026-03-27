@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0-dev] - 2026-03-27
+
+### Added
+
+- **Material UI Buttons**: Replaced plain buttons with MUI `IconButton` components
+  - Reset → Refresh icon (blue)
+  - Pause → Pause icon (yellow) / Resume → Play icon (green)
+  - Stop → Stop icon (red)
+- **Grace Period for Loop Count**: Resets within the grace period after start do not increment loop count (configurable via `REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS`, default: 5s; always increments if interval < grace period)
+- **Keyboard Shortcuts Guide**: Replaced single-line hint with labeled bullet-point list
+- **Timer Display**: Remaining time shown in larger font
+- **Favicon**: Changed from default React icon to a timer emoji (⏱)
+- **Theme Color**: Browser theme color now reads from `REACT_APP_COLOR_BACKGROUND`
+
+### Changed
+
+- **Button Order**: Reset button moved to center (Pause → Reset → Stop)
+- **Modifier Key Handling**: Ctrl, Alt, Meta/Cmd, Shift, Tab, CapsLock no longer trigger interval reset
+- **Warning Threshold**: Default increased from 20s to 30s
+- **Env Variable Renamed**: `REACT_APP_COLOR_DEFAULT` → `REACT_APP_COLOR_BACKGROUND`
+
 ## [2.0.0] - 2026-03-20
 
 ### Added

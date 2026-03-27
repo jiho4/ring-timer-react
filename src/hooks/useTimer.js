@@ -51,9 +51,15 @@ export function useTimer() {
 
     const resetInterval = () => {
         if (isRunning && !isPaused) {
+            const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS);
+            const elapsedSinceStart = (Date.now() - intervalStartRef.current) / 1000;
+            // Don't increment loop count if reset within grace period of start, unless interval < grace period
+            const justStarted = intervalSeconds >= gracePeriod && elapsedSinceStart < gracePeriod;
             intervalStartRef.current = Date.now();
             hasBelledRef.current = false;
-            setLoopCount((prevCount) => prevCount + 1);
+            if (!justStarted) {
+                setLoopCount((prevCount) => prevCount + 1);
+            }
             setRemainingSeconds(intervalSeconds);
         }
     };

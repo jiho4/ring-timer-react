@@ -18,7 +18,7 @@ export const CONFIG = {
     // Color Configuration
     COLORS: {
         // Default background color (dark)
-        DEFAULT: process.env.REACT_APP_COLOR_DEFAULT || '#282c34',
+        DEFAULT: process.env.REACT_APP_COLOR_BACKGROUND || '#282c34',
 
         // Warning color at 0 seconds (red)
         ALERT: process.env.REACT_APP_COLOR_ALERT || '#cb3e3e',

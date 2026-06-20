@@ -22,22 +22,16 @@ describe('TimerScreen', () => {
         jest.clearAllMocks();
     });
 
-    test('renders interval setting', () => {
+    test('renders timer stats', () => {
         render(<TimerScreen {...defaultProps} />);
 
-        expect(screen.getByText('Interval Setting: 60 sec')).toBeInTheDocument();
-    });
-
-    test('renders loop count', () => {
-        render(<TimerScreen {...defaultProps} />);
-
-        expect(screen.getByText('Current Loop Count: 2')).toBeInTheDocument();
-    });
-
-    test('renders elapsed time', () => {
-        render(<TimerScreen {...defaultProps} />);
-
-        expect(screen.getByText(/Elapsed Time:/)).toBeInTheDocument();
+        expect(screen.getByTestId('screen-card')).toBeInTheDocument();
+        expect(screen.getByTestId('screen-card-top')).toBeInTheDocument();
+        expect(screen.getByTestId('screen-card-main')).toBeInTheDocument();
+        expect(screen.getByTestId('screen-card-actions')).toBeInTheDocument();
+        expect(screen.getByText('Interval: 60s')).toBeInTheDocument();
+        expect(screen.getByText('Loops: 2')).toBeInTheDocument();
+        expect(screen.getByText(/Elapsed:/)).toBeInTheDocument();
         expect(mockHandlers.calculateElapsedTime).toHaveBeenCalled();
     });
 
@@ -67,77 +61,50 @@ describe('TimerScreen', () => {
         expect(screen.queryByText(/PAUSED/)).not.toBeInTheDocument();
     });
 
-    test('renders Reset button', () => {
-        render(<TimerScreen {...defaultProps} />);
-
-        expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
-    });
-
-    test('renders Pause button when not paused', () => {
-        render(<TimerScreen {...defaultProps} isPaused={false} />);
-
+    test('renders Pause button when not paused and Resume when paused', () => {
+        const { rerender } = render(<TimerScreen {...defaultProps} isPaused={false} />);
         expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
-    });
 
-    test('renders Resume button when paused', () => {
-        render(<TimerScreen {...defaultProps} isPaused={true} />);
-
+        rerender(<TimerScreen {...defaultProps} isPaused={true} />);
         expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument();
     });
 
-    test('renders Stop button', () => {
+    test('renders Reset and Stop buttons', () => {
         render(<TimerScreen {...defaultProps} />);
 
+        expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Stop' })).toBeInTheDocument();
+    });
+
+    test('calls correct handler when each button is clicked', () => {
+        render(<TimerScreen {...defaultProps} />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Pause' }));
+        expect(mockHandlers.onTogglePause).toHaveBeenCalledTimes(1);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+        expect(mockHandlers.onStop).toHaveBeenCalledTimes(1);
     });
 
     test('calls onReset when Reset button is clicked', () => {
         render(<TimerScreen {...defaultProps} />);
 
-        const button = screen.getByRole('button', { name: 'Reset' });
-        fireEvent.click(button);
+        fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
 
         expect(mockHandlers.onReset).toHaveBeenCalledTimes(1);
     });
 
-    test('calls onTogglePause when Pause button is clicked', () => {
+    test('Reset button is disabled when paused and enabled otherwise', () => {
+        const { rerender } = render(<TimerScreen {...defaultProps} isPaused={true} />);
+        expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled();
+
+        rerender(<TimerScreen {...defaultProps} isPaused={false} />);
+        expect(screen.getByRole('button', { name: 'Reset' })).not.toBeDisabled();
+    });
+
+    test('displays concise keyboard shortcuts guide', () => {
         render(<TimerScreen {...defaultProps} />);
 
-        const button = screen.getByRole('button', { name: 'Pause' });
-        fireEvent.click(button);
-
-        expect(mockHandlers.onTogglePause).toHaveBeenCalledTimes(1);
-    });
-
-    test('calls onStop when Stop button is clicked', () => {
-        render(<TimerScreen {...defaultProps} />);
-
-        const button = screen.getByRole('button', { name: 'Stop' });
-        fireEvent.click(button);
-
-        expect(mockHandlers.onStop).toHaveBeenCalledTimes(1);
-    });
-
-    test('Reset button is disabled when paused', () => {
-        render(<TimerScreen {...defaultProps} isPaused={true} />);
-
-        const button = screen.getByRole('button', { name: 'Reset' });
-        expect(button).toBeDisabled();
-    });
-
-    test('Reset button is enabled when not paused', () => {
-        render(<TimerScreen {...defaultProps} isPaused={false} />);
-
-        const button = screen.getByRole('button', { name: 'Reset' });
-        expect(button).not.toBeDisabled();
-    });
-
-    test('displays keyboard shortcuts guide', () => {
-        render(<TimerScreen {...defaultProps} />);
-
-        expect(screen.getByText('Keyboard Shortcuts')).toBeInTheDocument();
-        expect(screen.getByText(/Any key/)).toBeInTheDocument();
-        expect(screen.getByText(/'P'/)).toBeInTheDocument();
-        expect(screen.getByText(/'Esc'/)).toBeInTheDocument();
+        expect(screen.getByText((_, node) => node.textContent === 'Keyboard Shortcut<Any> = reset, <P> = pause, <Esc> = stop')).toBeInTheDocument();
     });
 });

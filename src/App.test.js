@@ -19,17 +19,17 @@ describe('App Integration Tests', () => {
         render(<App />);
 
         expect(screen.getByText('Ring Timer')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Enter interval in seconds')).toBeInTheDocument();
+        expect(screen.getByLabelText('Interval (seconds)')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         expect(input.value).toBe(CONFIG.DEFAULT_INTERVAL_SECONDS.toString());
     });
 
     test('shows error when trying to start with empty input', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '' } });
 
         const startButton = screen.getByRole('button', { name: 'Start' });
@@ -41,7 +41,7 @@ describe('App Integration Tests', () => {
     test('shows error when trying to start with empty input', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '' } });
         fireEvent.blur(input);
 
@@ -51,7 +51,7 @@ describe('App Integration Tests', () => {
     test('shows error when trying to start with zero', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '0' } });
 
         const startButton = screen.getByRole('button', { name: 'Start' });
@@ -63,7 +63,7 @@ describe('App Integration Tests', () => {
     test('clears error message when user starts typing', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '' } });
 
         const startButton = screen.getByRole('button', { name: 'Start' });
@@ -79,25 +79,36 @@ describe('App Integration Tests', () => {
     test('starts timer with valid input', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '60' } });
 
         const startButton = screen.getByRole('button', { name: 'Start' });
         fireEvent.click(startButton);
 
-        expect(screen.getByText('Interval Setting: 60 sec')).toBeInTheDocument();
+        expect(screen.getByText('Interval: 60s')).toBeInTheDocument();
         expect(screen.getByText('Time Left')).toBeInTheDocument();
     });
 
     test('can start timer with Enter key', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '30' } });
 
         fireEvent.keyDown(window, { key: 'Enter' });
 
-        expect(screen.getByText('Interval Setting: 30 sec')).toBeInTheDocument();
+        expect(screen.getByText('Interval: 30s')).toBeInTheDocument();
+    });
+
+    test('can start timer with Space key', () => {
+        render(<App />);
+
+        const input = screen.getByLabelText('Interval (seconds)');
+        fireEvent.change(input, { target: { value: '45' } });
+
+        fireEvent.keyDown(window, { key: ' ', code: 'Space' });
+
+        expect(screen.getByText('Interval: 45s')).toBeInTheDocument();
     });
 
     test('displays timer controls when running', () => {
@@ -127,7 +138,7 @@ describe('App Integration Tests', () => {
     test('stop button returns to initial screen', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '60' } });
 
         const startButton = screen.getByRole('button', { name: 'Start' });
@@ -137,11 +148,11 @@ describe('App Integration Tests', () => {
         fireEvent.click(stopButton);
 
         // Back to initial screen
-        expect(screen.getByPlaceholderText('Enter interval in seconds')).toBeInTheDocument();
+        expect(screen.getByLabelText('Interval (seconds)')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
 
         // Input should have the last interval value
-        const inputAfterStop = screen.getByPlaceholderText('Enter interval in seconds');
+        const inputAfterStop = screen.getByLabelText('Interval (seconds)');
         expect(inputAfterStop.value).toBe('60');
     });
 
@@ -153,7 +164,7 @@ describe('App Integration Tests', () => {
 
         fireEvent.keyDown(window, { key: 'Escape' });
 
-        expect(screen.getByPlaceholderText('Enter interval in seconds')).toBeInTheDocument();
+        expect(screen.getByLabelText('Interval (seconds)')).toBeInTheDocument();
     });
 
     test('P key toggles pause', () => {
@@ -178,14 +189,14 @@ describe('App Integration Tests', () => {
         const startButton = screen.getByRole('button', { name: 'Start' });
         fireEvent.click(startButton);
 
-        expect(screen.getByText('Current Loop Count: 0')).toBeInTheDocument();
+        expect(screen.getByText('Loops: 0')).toBeInTheDocument();
 
         jest.advanceTimersByTime(Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS) * 1000);
 
         const resetButton = screen.getByRole('button', { name: 'Reset' });
         fireEvent.click(resetButton);
 
-        expect(screen.getByText('Current Loop Count: 1')).toBeInTheDocument();
+        expect(screen.getByText('Loops: 1')).toBeInTheDocument();
 
         jest.useRealTimers();
     });
@@ -197,17 +208,17 @@ describe('App Integration Tests', () => {
         const startButton = screen.getByRole('button', { name: 'Start' });
         fireEvent.click(startButton);
 
-        expect(screen.getByText('Current Loop Count: 0')).toBeInTheDocument();
+        expect(screen.getByText('Loops: 0')).toBeInTheDocument();
 
         const gracePeriod = Number(process.env.REACT_APP_LOOP_COUNT_GRACE_PERIOD_SECONDS) * 1000;
 
         jest.advanceTimersByTime(gracePeriod);
         fireEvent.keyDown(window, { key: 'a' });
-        expect(screen.getByText('Current Loop Count: 1')).toBeInTheDocument();
+        expect(screen.getByText('Loops: 1')).toBeInTheDocument();
 
         jest.advanceTimersByTime(gracePeriod);
         fireEvent.keyDown(window, { key: ' ' });
-        expect(screen.getByText('Current Loop Count: 2')).toBeInTheDocument();
+        expect(screen.getByText('Loops: 2')).toBeInTheDocument();
 
         jest.useRealTimers();
     });
@@ -228,7 +239,7 @@ describe('App Integration Tests', () => {
     test('validation on blur shows error', () => {
         render(<App />);
 
-        const input = screen.getByPlaceholderText('Enter interval in seconds');
+        const input = screen.getByLabelText('Interval (seconds)');
         fireEvent.change(input, { target: { value: '-5' } });
         fireEvent.blur(input);
 

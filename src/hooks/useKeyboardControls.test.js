@@ -29,6 +29,14 @@ describe('useKeyboardControls', () => {
         expect(mockHandlers.onStart).toHaveBeenCalledTimes(1);
     });
 
+    test('calls onStart when Space is pressed and not running', () => {
+        renderHook(() => useKeyboardControls(mockHandlers));
+
+        fireKeyboardEvent(' ', { code: 'Space' });
+
+        expect(mockHandlers.onStart).toHaveBeenCalledTimes(1);
+    });
+
     test('does not call onStart when Enter is pressed and running', () => {
         mockHandlers.isRunning = true;
         renderHook(() => useKeyboardControls(mockHandlers));

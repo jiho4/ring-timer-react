@@ -17,14 +17,15 @@ A React-based interval timer application with audio notifications. Perfect for P
 - **Keyboard Shortcuts** - Full keyboard control support (modifier keys ignored)
 - **Input Validation** - Prevents invalid time values
 - **Last Value Memory** - Remembers your last interval setting
-- **Material UI Controls** - Icon buttons with color-coded actions
+- **Flat Card UI** - Simple centered setup and timer cards built with Material UI
+- **Shared Screen Layout** - Landing and timer screens use the same card structure for smoother transitions
 
 ## Usage
 
 ### Starting a Timer
 
 1. Enter interval time in seconds (or use default from `.env`)
-2. Click **Start** button or press **Enter** key
+2. Click **Start** or press **Enter** / **Space**
 3. Timer begins countdown with visual feedback
 
 ### Controls (Keyboard Shortcuts)
@@ -32,14 +33,15 @@ A React-based interval timer application with audio notifications. Perfect for P
 | Key | Action | Available When |
 |-----|--------|----------------|
 | **Enter** | Start timer | Initial screen |
+| **Space** | Start timer | Initial screen |
 | **Any key** | Reset interval (restart countdown) | Timer running & not paused (modifier keys ignored) |
 | **P** | Pause/Resume timer | Timer running |
 | **Esc** | Stop timer and return to setup | Timer running |
 
 ### Controls (Mouse)
 
-- **Reset** - Restarts the current interval and increments loop count
 - **Pause / Resume** - Pause or resume the timer
+- **Reset** - Restarts the current interval and increments loop count
 - **Stop** - Stop timer and return to initial screen
 
 ### Visual Feedback
@@ -56,8 +58,9 @@ src/
 ├── components/
 │   ├── InitialScreen.js      # Setup/input screen component
 │   ├── InitialScreen.test.js # Component tests
-│   ├── TimerScreen.js         # Running timer display component
-│   └── TimerScreen.test.js    # Component tests
+│   ├── ScreenCard.js         # Shared card layout for both screens
+│   ├── TimerScreen.js        # Running timer display component
+│   └── TimerScreen.test.js   # Component tests
 ├── hooks/
 │   ├── useTimer.js            # Timer logic & state management
 │   ├── useTimer.test.js       # Hook tests
@@ -79,7 +82,7 @@ src/
 ## Technology Stack
 
 - **React 18** - UI framework
-- **Material UI** - Icon buttons and tooltips
+- **Material UI** - Text fields, buttons, chips, cards, icons, and typography
 - **Jest** - Testing framework
 - **React Testing Library** - Component testing utilities
 - **Create React App** - Build tooling
@@ -103,7 +106,7 @@ npm install
 npm start
 ```
 
-Opens [http://localhost:3000](http://localhost:3000) in your browser.
+Opens [http://localhost:30001](http://localhost:30001) in your browser.
 
 ### Running Tests
 
@@ -124,11 +127,10 @@ npm test
 ### Test Coverage
 
 The application includes comprehensive unit and integration tests:
-- 90+ test cases
 - Utility functions (formatters, colors, validation)
 - Custom hooks (timer logic, keyboard controls)
-- React components (UI rendering, user interactions)
-- Integration tests (complete user workflows)
+- React components (UI rendering, layout structure, user interactions)
+- Integration tests (complete user workflows and keyboard shortcuts)
 
 ## Build & Deployment
 
@@ -144,11 +146,8 @@ Creates an optimized production build in the `build/` folder.
 ### Serving Production Build Locally
 
 ```bash
-# Install serve globally (one-time)
-npm install -g serve
-
-# Serve the production build
-serve -s build
+# Serve the production build on port 30001
+npm run serve
 ```
 
 ### Build Output
@@ -156,7 +155,7 @@ serve -s build
 The build folder contains:
 - Minified and optimized JavaScript bundles
 - CSS files with vendor prefixes
-- Static assets (audio files, images)
+- Static assets (audio files, favicon)
 - index.html with proper asset references
 
 ## Configuration

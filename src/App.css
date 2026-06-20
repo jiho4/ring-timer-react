@@ -1,29 +1,37 @@
 .App {
+    --app-background: #1f2937;
+    min-height: 100vh;
+    background: var(--app-background);
+    color: #e5e7eb;
+    transition: background 200ms ease;
+}
+
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+}
+
+.app-panel {
+    width: min(100%, 460px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.app-heading {
     text-align: center;
 }
 
-.App-header {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+.app-heading h1 {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 2.85rem);
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    font-size: calc(20px + 3vmin);
-    color: white;
-}
-
-input {
-    padding: 12px;
-    font-size: 28px;
-    margin-right: 10px;
-}
-
-button {
-    padding: 12px 24px;
-    font-size: 28px;
-    cursor: pointer;
-}
-
-.timer-remaining-time {
-    font-size: 3rem;
+    gap: 0.26em;
 }

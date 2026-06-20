@@ -1,6 +1,6 @@
 {
     "name": "ring-timer-react",
-    "version": "2.1.0-dev",
+    "version": "3.0.0-dev",
     "private": true,
     "dependencies": {
         "@emotion/react": "^11.14.0",
@@ -20,7 +20,9 @@
         "@testing-library/jest-dom": "^6.9.1"
     },
     "scripts": {
-        "start": "react-scripts start",
+        "start": "PORT=30001 react-scripts start",
+        "serve": "serve -s build -l 30001",
+        "stop": "lsof -ti :30001 | xargs kill",
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"

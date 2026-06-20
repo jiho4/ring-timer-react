@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AlarmIcon from '@mui/icons-material/Alarm';
 import './App.css';
 import { useTimer } from './hooks/useTimer';
 import { useKeyboardControls } from './hooks/useKeyboardControls';
@@ -62,32 +63,38 @@ function App() {
     });
 
     const backgroundColor = getBackgroundColor(isRunning, remainingSeconds);
-
     return (
-        <div className="App">
-            <header className="App-header" style={{ backgroundColor }}>
-                <h3>Ring Timer</h3>
-                {!isRunning ? (
-                    <InitialScreen
-                        inputValue={inputValue}
-                        onInputChange={handleInputChange}
-                        onStart={handleStart}
-                        errorMessage={errorMessage}
-                        onValidate={handleValidate}
-                    />
-                ) : (
-                    <TimerScreen
-                        intervalSeconds={intervalSeconds}
-                        loopCount={loopCount}
-                        remainingSeconds={remainingSeconds}
-                        isPaused={isPaused}
-                        calculateElapsedTime={calculateElapsedTime}
-                        onReset={resetInterval}
-                        onTogglePause={togglePause}
-                        onStop={handleStop}
-                    />
-                )}
-            </header>
+        <div className="App" style={{ '--app-background': backgroundColor }}>
+            <main className="app-shell">
+                <section className="app-panel">
+                    <div className="app-heading">
+                        <h1>
+                            <AlarmIcon fontSize="inherit" />
+                            <span>Ring Timer</span>
+                        </h1>
+                    </div>
+                    {!isRunning ? (
+                        <InitialScreen
+                            inputValue={inputValue}
+                            onInputChange={handleInputChange}
+                            onStart={handleStart}
+                            errorMessage={errorMessage}
+                            onValidate={handleValidate}
+                        />
+                    ) : (
+                        <TimerScreen
+                            intervalSeconds={intervalSeconds}
+                            loopCount={loopCount}
+                            remainingSeconds={remainingSeconds}
+                            isPaused={isPaused}
+                            calculateElapsedTime={calculateElapsedTime}
+                            onReset={resetInterval}
+                            onTogglePause={togglePause}
+                            onStop={handleStop}
+                        />
+                    )}
+                </section>
+            </main>
         </div>
     );
 }

@@ -11,27 +11,25 @@ export function useKeyboardControls({
 }) {
     useEffect(() => {
         const handleKeyDown = (event) => {
-            // Handle Enter key on initial page
-            if (event.key === 'Enter' && !isRunning) {
+            const isStartKey = event.key === 'Enter' || event.key === ' ' || event.code === 'Space';
+
+            if (isStartKey && !isRunning) {
                 event.preventDefault();
                 onStart();
                 return;
             }
 
-            // Handle Escape key - stop timer
             if (event.key === 'Escape') {
                 onStop();
                 return;
             }
 
-            // Handle P key - pause/resume
             if ((event.key === 'p' || event.key === 'P') && isRunning) {
                 event.preventDefault();
                 onTogglePause();
                 return;
             }
 
-            // Any other key while running and not paused - reset timer interval
             const ignoredKeys = new Set(['Tab', 'CapsLock', 'Control', 'Alt', 'Meta', 'Shift']);
             if (ignoredKeys.has(event.key)) return;
 
